@@ -584,7 +584,8 @@ class SpMat : public SpBase< eT, SpMat<eT> >
 
   arma_inline void invalidate_cache() const;
   arma_inline void invalidate_csc()   const;
-  
+
+  public:
   arma_inline void sync_cache() const;
   arma_inline void sync_csc()   const;
   
