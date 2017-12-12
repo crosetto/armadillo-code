@@ -614,8 +614,8 @@ class SpMat : public SpBase< eT, SpMat<eT> >
   
   #if !defined(_OPENMP) && defined(ARMA_USE_CXX11)
   arma_aligned mutable std::mutex cache_mutex;
+  arma_aligned mutable std::mutex csc_mutex;
   #endif
-  
   
   friend class SpValProxy< SpMat<eT> >;  // allow SpValProxy to call insert_element() and delete_element()
   friend class SpSubview<eT>;
