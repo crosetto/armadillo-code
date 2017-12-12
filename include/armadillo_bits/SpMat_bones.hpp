@@ -567,7 +567,7 @@ class SpMat : public SpBase< eT, SpMat<eT> >
   
   
   protected:
-
+  
   inline void init(uword in_rows, uword in_cols);
   inline void init(const std::string& text);
   inline void init(const  SpMat<eT>& x);
@@ -585,10 +585,8 @@ class SpMat : public SpBase< eT, SpMat<eT> >
   arma_inline void invalidate_cache() const;
   arma_inline void invalidate_csc()   const;
 
-  public:
   arma_inline void sync_cache() const;
   arma_inline void sync_csc()   const;
-  
   private:
   
   inline arma_hot arma_warn_unused SpValProxy<SpMat<eT> > get_value(const uword i);
@@ -613,6 +611,11 @@ class SpMat : public SpBase< eT, SpMat<eT> >
   // 0: cache needs to be updated from CSC
   // 1: CSC needs to be updated from cache
   // 2: no update required
+  
+  #if !defined(_OPENMP) && defined(ARMA_USE_CXX11)
+  arma_aligned mutable std::mutex cache_mutex;
+  #endif
+  
   
   friend class SpValProxy< SpMat<eT> >;  // allow SpValProxy to call insert_element() and delete_element()
   friend class SpSubview<eT>;

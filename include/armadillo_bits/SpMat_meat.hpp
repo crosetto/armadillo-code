@@ -5725,7 +5725,7 @@ SpMat<eT>::sync_cache() const
   // the sequence of operations is guaranteed to appear sequentially consistent
   // as data races are prevented via the mutex
   
-#if defined(_OPENMP)
+  #if defined(_OPENMP)
     if(sync_state == 0)
       {
       #pragma omp critical
@@ -5735,20 +5735,31 @@ SpMat<eT>::sync_cache() const
         sync_state = 2;
         }
       }
-#else
+  #elif defined(ARMA_USE_CXX11)
+    if(sync_state == 0)
+      {
+      cache_mutex.lock();
+      if(sync_state == 0)
+        {
+        cache      = (*this);
+        sync_state = 2;
+        }
+      cache_mutex.unlock();
+      }
+  #else
     if(sync_state == 0)
       {
       cache      = (*this);
       sync_state = 2;
       }
-#endif
+  #endif
   }
 
 
 
 
 template<typename eT>
-arma_inline
+inline
 void
 SpMat<eT>::sync_csc() const
   {
@@ -5777,6 +5788,22 @@ SpMat<eT>::sync_csc() const
         
         sync_state = 2;
         }
+      }
+  #elif defined(ARMA_USE_CXX11)
+    if(sync_state == 1)
+      {
+      cache_mutex.lock();
+      if(sync_state == 1)
+        {
+        SpMat<eT> tmp(cache);
+        
+        SpMat<eT>& x = const_cast< SpMat<eT>& >(*this);
+        
+        x.steal_mem_simple(tmp);
+        
+        sync_state = 2;
+        }
+      cache_mutex.unlock();
       }
   #else
     if(sync_state == 1)
