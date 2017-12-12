@@ -5738,13 +5738,12 @@ SpMat<eT>::sync_cache() const
   #elif defined(ARMA_USE_CXX11)
     if(sync_state == 0)
       {
-      cache_mutex.lock();
-      if(sync_state == 0)
+	   std::lock_guard<std::mutex> t(cache_mutex);
+	   if(sync_state == 0)
         {
         cache      = (*this);
         sync_state = 2;
         }
-      cache_mutex.unlock();
       }
   #else
     if(sync_state == 0)
@@ -5792,8 +5791,8 @@ SpMat<eT>::sync_csc() const
   #elif defined(ARMA_USE_CXX11)
     if(sync_state == 1)
       {
-      cache_mutex.lock();
-      if(sync_state == 1)
+	   std::lock_guard<std::mutex> t(csc_mutex);
+	   if(sync_state == 1)
         {
         SpMat<eT> tmp(cache);
         
@@ -5803,7 +5802,6 @@ SpMat<eT>::sync_csc() const
         
         sync_state = 2;
         }
-      cache_mutex.unlock();
       }
   #else
     if(sync_state == 1)
